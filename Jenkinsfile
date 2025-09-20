@@ -5,6 +5,7 @@ pipeline {
             steps {
                 // Apply Kubernetes manifests
                 sh '/opt/homebrew/bin/kubectl apply -f k8s/wordpress-deployment.yaml'
+                sh '/opt/homebrew/bin/kubectl apply -f k8s/mysql-deployment.yaml'
                 sh '/opt/homebrew/bin/kubectl apply -f k8s/wordpress-service.yaml'
             }
         }
