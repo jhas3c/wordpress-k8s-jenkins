@@ -1,25 +1,17 @@
 pipeline {
     agent any
-    environment {
-        REGISTRY = "docker.io/jhadeepakkumar14"
-        IMAGE = "wordpress-k8s"
-    }
     stages {
-        stage('Build Docker Image') {
+        stage('Deploy WordPress') {
             steps {
-                sh 'docker build -t $REGISTRY/$IMAGE:$BUILD_NUMBER .'
+                // Apply Kubernetes manifests
+                sh 'kubectl apply -f k8s/wordpress-deployment.yaml'
+                sh 'kubectl apply -f k8s/wordpress-service.yaml'
             }
         }
-        stage('Push Docker Image') {
+        stage('Verify Deployment') {
             steps {
-                withDockerRegistry([credentialsId: 'dockerhub-creds', url: '']) {
-                    sh 'docker push $REGISTRY/$IMAGE:$BUILD_NUMBER'
-                }
-            }
-        }
-        stage('Deploy to Kubernetes') {
-            steps {
-                sh 'kubectl apply -f k8s/'
+                sh 'kubectl get pods -l app=wordpress'
+                sh 'kubectl get svc wordpress-service'
             }
         }
     }
